@@ -1,33 +1,57 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Cube : MonoBehaviour
 {
-    private int _minLifeTime = 1;
-    private int _maxLifeTime = 2;
+    [SerializeField] private List<Material> _colors = new List<Material>();
+    [SerializeField] private Material _startMaterial;
+
+    private int _minLifeTime = 2;
+    private int _maxLifeTime = 6;
+    private MeshRenderer _renderer;
+    private bool _colorChanged = false;
 
     private int LifeTime => UnityEngine.Random.Range(_minLifeTime, _maxLifeTime + 1);
 
-    public event Action<Cube> CubeRemove;
+    public event Action<Cube> Removed;
 
-    public void OnRemove()
+    private void Awake()
     {
-        CubeRemove?.Invoke(this);
+        _renderer = GetComponent<MeshRenderer>();
+        ResetMaterial();
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.TryGetComponent(out Floor floor))
+        if (collision.gameObject.TryGetComponent(out Floor floor) && _colorChanged == false)
         {
-            DestroyInTime(LifeTime);
+            Debug.Log("collision happened");
+            SetRandomColor(_renderer);
+            StartCoroutine(DestroyInTime(LifeTime));
         }
     }
 
     private IEnumerator DestroyInTime(int delay)
     {
         yield return new WaitForSeconds(delay);
+        Removed?.Invoke(this);
+        ResetMaterial();
+    }
 
-        Destroy(gameObject);
+    private void ResetMaterial()
+    {
+        _colorChanged = false;
+        _renderer.material = _startMaterial;
+    }
+
+    private void SetRandomColor(MeshRenderer meshRenderer)
+    {
+        int minColorNumber = 0;
+        int randomColor = UnityEngine.Random.Range(minColorNumber, _colors.Count);
+        meshRenderer.material = _colors[randomColor];
+        Debug.Log("Color is changed");
+        _colorChanged = true;
     }
 }

@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.Pool;
 
-[RequireComponent(typeof(Cube))]
 public class Spawner : MonoBehaviour
 {
     [SerializeField] private Cube _cubePrefab;
@@ -13,15 +12,15 @@ public class Spawner : MonoBehaviour
 
     private void Awake()
     {
-        _pool = new ObjectPool<Cube>(CreateCube, ActionOnGet, ActionOnRelease, Destroy, true, _poolCapacity, _poolMaxSize);
+        _pool = new ObjectPool<Cube>(CreateCube, GetFromPool, ReleaseInPool, Destroy, true, _poolCapacity, _poolMaxSize);
     }
 
     private void Start()
     {
-        InvokeRepeating(nameof(GetCube), 0.5f, _repeatRate);
+        InvokeRepeating(nameof(GetCube), 0.5f, _repeatRate); //заменить корутиной
     }
 
-    private void ActionOnGet(Cube cube)
+    private void GetFromPool(Cube cube)
     {
         int minStartPointX = 15;
         int maxStartPointX = 25;
@@ -34,7 +33,7 @@ public class Spawner : MonoBehaviour
         cube.gameObject.SetActive(true);
     }
 
-    private void ActionOnRelease(Cube cube)
+    private void ReleaseInPool(Cube cube)
     {
         cube.gameObject.SetActive(false);
     }
@@ -42,17 +41,19 @@ public class Spawner : MonoBehaviour
     private Cube CreateCube()
     {
         Cube cube = Instantiate(_cubePrefab);
-        cube.CubeRemove += RemoveCube;
+
         return cube;
     }
 
     private void RemoveCube(Cube cube)
     {
         _pool.Release(cube);
+        cube.Removed -= RemoveCube;
     }
 
     private void GetCube()
     {
-        _pool.Get();
+        Cube newCube = _pool.Get();
+        newCube.Removed += RemoveCube;
     }
 }
