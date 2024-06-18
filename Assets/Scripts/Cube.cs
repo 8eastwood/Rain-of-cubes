@@ -11,10 +11,8 @@ public class Cube : MonoBehaviour
     private int _minLifeTime = 2;
     private int _maxLifeTime = 6;
     private MeshRenderer _renderer;
-    private bool _colorChanged = false;
-
     private int LifeTime => UnityEngine.Random.Range(_minLifeTime, _maxLifeTime + 1);
-
+    private bool _colorChanged = false;
     public event Action<Cube> Removed;
 
     private void Awake()
