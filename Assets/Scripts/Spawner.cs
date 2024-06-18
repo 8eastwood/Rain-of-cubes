@@ -17,7 +17,9 @@ public class Spawner : MonoBehaviour
 
     private void Start()
     {
-        InvokeRepeating(nameof(GetCube), 0.5f, _repeatRate);
+        //InvokeRepeating(nameof(GetCube), 0.5f, _repeatRate);
+        StartCoroutine(nameof(GetCube));
+        yield return new WaitForSeconds(_repeatRate);
     }
 
     private void GetFromPool(Cube cube)

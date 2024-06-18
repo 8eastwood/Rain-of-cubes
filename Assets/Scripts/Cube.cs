@@ -8,11 +8,12 @@ public class Cube : MonoBehaviour
     [SerializeField] private List<Material> _colors = new List<Material>();
     [SerializeField] private Material _startMaterial;
 
+    private int LifeTime => UnityEngine.Random.Range(_minLifeTime, _maxLifeTime + 1);
     private int _minLifeTime = 2;
     private int _maxLifeTime = 6;
     private MeshRenderer _renderer;
-    private int LifeTime => UnityEngine.Random.Range(_minLifeTime, _maxLifeTime + 1);
     private bool _colorChanged = false;
+
     public event Action<Cube> Removed;
 
     private void Awake()
