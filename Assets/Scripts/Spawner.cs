@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -9,6 +10,7 @@ public class Spawner : MonoBehaviour
     [SerializeField] private int _poolMaxSize = 5;
 
     private ObjectPool<Cube> _pool;
+    private bool _isWorking = true;
 
     private void Awake()
     {
@@ -17,9 +19,7 @@ public class Spawner : MonoBehaviour
 
     private void Start()
     {
-        //InvokeRepeating(nameof(GetCube), 0.5f, _repeatRate);
-        StartCoroutine(nameof(GetCube));
-        yield return new WaitForSeconds(_repeatRate);
+        StartCoroutine(SpawnCubeWithRate(_repeatRate));
     }
 
     private void GetFromPool(Cube cube)
@@ -51,6 +51,15 @@ public class Spawner : MonoBehaviour
     {
         _pool.Release(cube);
         cube.Removed -= RemoveCube;
+    }
+
+    private IEnumerator SpawnCubeWithRate(float repeatRate)
+    {
+        while (_isWorking)
+        {
+            yield return new WaitForSeconds(repeatRate);
+            GetCube();
+        }
     }
 
     private void GetCube()
