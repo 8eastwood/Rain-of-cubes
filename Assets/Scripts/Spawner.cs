@@ -55,9 +55,12 @@ public class Spawner : MonoBehaviour
 
     private IEnumerator SpawnCubeWithRate(float repeatRate)
     {
+        var wait = new WaitForSeconds(repeatRate);
+
         while (_isWorking)
         {
-            yield return new WaitForSeconds(repeatRate);
+            yield return wait;
+
             GetCube();
         }
     }
